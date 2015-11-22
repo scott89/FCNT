@@ -1,0 +1,71 @@
+name: "gnet"
+input: "data"
+input_dim: 1
+input_dim: 64
+#input_dim: 232
+#input_dim: 232
+input_dim: 46 #48
+input_dim: 46 #48
+#input_dim: 480
+#input_dim: 480
+
+
+layers {
+  bottom: "data"
+  top: "conv5_f1"
+  name: "conv5_f1"
+  type: CONVOLUTION
+  blobs_lr: 1 #100 #15
+  blobs_lr: 2 #200 #30
+  weight_decay: 2
+  weight_decay: 0
+  convolution_param {
+    num_output: 32
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 1e-7 #1e-7
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+}
+layers{ 
+  bottom: "conv5_f1"
+  top: "conv5_f1"
+  name: "relu5_f1"
+  type: RELU
+}
+
+layers {
+  bottom: "conv5_f1"
+  top: "conv5_f2"
+  name: "conv5_f2"
+  type: CONVOLUTION
+  blobs_lr:1 # 30# 15
+  blobs_lr:2 # 40# 30
+  weight_decay: 2 #1
+  weight_decay: 0 #0
+  convolution_param {
+    num_output: 1
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 1e-7
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+#layers{ 
+#  bottom: "conv5_f2"
+#  top: "conv5_f2"
+#  name: "relu5_f2"
+#  type: RELU
+#

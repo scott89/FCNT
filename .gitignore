@@ -1,0 +1,8 @@
+*.m~
+*.mex64
+*.mexglx
+*.png
+*.caffemodel
+*.zip
+*.mat
+PF_CNN7

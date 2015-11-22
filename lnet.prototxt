@@ -1,0 +1,79 @@
+name: "lnet"
+input: "data"
+input_dim: 1
+input_dim: 512
+#input_dim: 232
+#input_dim: 232
+input_dim: 46 #48
+input_dim: 46 #48
+#input_dim: 480
+#input_dim: 480
+
+#layers {
+#  bottom: "data"
+#  top: "conv5_f0"
+#  name: "drop5"
+#  type: DROPOUT
+#  dropout_param {
+#    dropout_ratio: 0.5
+#  }
+#}
+layers {
+  bottom: "data"
+  top: "conv5_f1"
+  name: "conv5_f1"
+  type: CONVOLUTION
+  blobs_lr: 1 #100 #15
+  blobs_lr: 2 #200 #30
+  weight_decay: 2
+  weight_decay: 0
+  convolution_param {
+    num_output: 128
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 1e-7 #1e-7
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+}
+layers{ 
+  bottom: "conv5_f1"
+  top: "conv5_f1"
+  name: "relu5_f1"
+  type: RELU
+}
+
+layers {
+  bottom: "conv5_f1"
+  top: "conv5_f2"
+  name: "conv5_f2"
+  type: CONVOLUTION
+  blobs_lr:1 # 30# 15
+  blobs_lr:2 # 40# 30
+  weight_decay: 2 #1
+  weight_decay: 0 #0
+  convolution_param {
+    num_output: 1
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 1e-7
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+#layers{ 
+#  bottom: "conv5_f2"
+#  top: "conv5_f2"
+#  name: "relu5_f2"
+#  type: RELU
+#

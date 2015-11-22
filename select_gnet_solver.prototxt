@@ -1,0 +1,21 @@
+net: 'select_gnet.prototxt'
+#test_iter: 1000 
+#test_interval: 1000
+##update_interval: 2
+lr_policy: "step"
+base_lr: 0.1e-9 #1e-9 #4e-8#  1e-9 #2e-8#5e-8#1e-8 #7e-8 #7e-6 #5e-7  #1.2e-6 #8e-7 #1e-9
+gamma: 0.1
+stepsize: 120000
+display: 1
+#max_iter: 450001
+momentum: 0.6 #0.5 #0.3
+weight_decay: 0.1 # 0.0005
+#snapshot: 1000
+#snapshot_prefix: "model5/track"
+solver_mode: GPU
+#use_mpi: false
+device_id: 0
+#test_initialization: false
+#debug_info: false
+#debug_display: 1000
+#random_seed: 7301274918649171
