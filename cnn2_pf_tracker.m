@@ -218,10 +218,10 @@ for im2_id = im1_id:fnum
     maxconf = l_conf(l_maxid);
     end
     
-%     if maxconf< pf_param.up_thr
-%         best_geo_param([3,5]) =  position([3,5], im2_id-1);
-% %         location = affgeo2loc( best_geo_param, pf_param.p_sz);
-%     end
+    if maxconf< pf_param.up_thr
+        best_geo_param([3,5]) =  position([3,5], im2_id-1);
+        location = affgeo2loc( best_geo_param, pf_param.p_sz);
+    end
     
     t = t+toc;
     drawresult(im2_id, mat2gray(im2), [pf_param.p_sz, pf_param.p_sz], affparam2mat(best_geo_param));

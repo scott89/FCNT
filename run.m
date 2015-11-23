@@ -1,7 +1,10 @@
-data_path = '~/Downloads/PF_CNN_SVM/data/';
+%data_path = '~/Downloads/PF_CNN_SVM/data/';
+%dataset = dir(data_path);
+data_path = '/home/ljwang/FCT_scale_base/video/';
 dataset = dir(data_path);
+
 % 
-for i=1:length(dataset)
+for i=6:length(dataset)
     if ~isdir([data_path dataset(i).name]) || strcmp(dataset(i).name, '.') || strcmp(dataset(i).name, '..') || strcmp(dataset(i).name, 'AE_train_Deer')
         continue;
     end

@@ -11,7 +11,8 @@ if ~isdir(track_res)
     mkdir(track_res);
 end
 
-data_path = ['~/Downloads/PF_CNN_SVM/data/' set_name '/'];
+%data_path = ['~/Downloads/PF_CNN_SVM/data/' set_name '/'];
+data_path = ['/home/ljwang/FCT_scale_base/video/' set_name '/'];
 GT = load([data_path 'groundtruth_rect.txt']);
 dia = (GT(1, 3)^2+GT(1, 4)^2)^0.5;
 
