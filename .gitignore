@@ -1,5 +1,5 @@
 *.m~
-*.~
+*~
 *.mex64
 *.mexa64
 *.mexglx
@@ -9,5 +9,4 @@
 *.mat
 PF_CNN7
 video
-feature_model
 pipeline
