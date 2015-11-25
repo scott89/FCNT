@@ -1,11 +1,11 @@
 function [sal, id] = compute_saliency(fea1, map, solver)
 caffe('set_phase_test');
-if strcmp(solver, 'lsolver')
-    out = caffe('forward_lnet', fea1);
+if strcmp(solver, 'ssolver')
+    out = caffe('forward_snet', fea1);
     diff1 = {out{1}-permute(single(map), [2,1,3])};
-    input_diff1 = caffe('backward_lnet', diff1);
+    input_diff1 = caffe('backward_snet', diff1);
     diff2 = {single(ones(size(fea1{1},1)))};
-    input_diff2 = caffe('backward2_lnet', diff2);
+    input_diff2 = caffe('backward2_snet', diff2);
 elseif strcmp(solver, 'gsolver')
     out = caffe('forward_gnet', fea1);
     diff2 = {single(ones(size(fea1{1},1)))};

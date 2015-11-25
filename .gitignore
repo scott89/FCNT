@@ -8,3 +8,6 @@
 *.zip
 *.mat
 PF_CNN7
+video
+caffe-fcnt
+feature_model

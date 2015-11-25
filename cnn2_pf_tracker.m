@@ -1,8 +1,8 @@
-function  cnn2_pf_tracker(set_name, im1_id, ch_num)
+function  position = cnn2_pf_tracker(tracker_param)
 
-set_tracker_param;
+load_tracker_param;
 caffe('presolve_gnet');
-caffe('presolve_lnet');
+caffe('presolve_snet');
 %% read images
 im1_name = sprintf([data_path 'img/%04d.jpg'], im1_id);
 im1 = double(imread(im1_name));
@@ -12,7 +12,7 @@ if size(im1,3)~=3
 end
 
 %% extract roi and display
-roi1 = ext_roi(im1, location, l1_off,  roi_size, s1);
+roi1 = ext_roi(im1, location, [0, 0],  roi_size, s1);
 %% save roi images
 %% ------------------------------
 figure(1)
@@ -29,18 +29,18 @@ gfea1 = imresize(fea1{2}, fea_sz(1:2));
 %% ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 max_iter_select = 100;
 max_iter = 50;
-map1 =  GetMap(size(im1), fea_sz, roi_size, location, l1_off, s1, 'gaussian');
+map1 =  GetMap(size(im1), fea_sz, roi_size, location, [0, 0], s1, 'gaussian');
 conf_store = 0;
 
 %% select
 caffe('set_phase_train');
 for i=1:max_iter_select
-l_pre_map = caffe('forward_lnet', {lfea1});
-l_pre_map = l_pre_map{1};
-figure(1011); subplot(1,2,1); imagesc(permute(l_pre_map,[2,1,3]));
-l_diff = l_pre_map-permute(single(map1), [2,1,3]);
-caffe('backward_lnet', {single(l_diff)});
-caffe('update_lnet');
+s_pre_map = caffe('forward_snet', {lfea1});
+s_pre_map = s_pre_map{1};
+figure(1011); subplot(1,2,1); imagesc(permute(s_pre_map,[2,1,3]));
+s_diff = s_pre_map-permute(single(map1), [2,1,3]);
+caffe('backward_snet', {single(s_diff)});
+caffe('update_snet');
 
 g_pre_map = caffe('forward_gnet', {gfea1});
 g_pre_map = g_pre_map{1};
@@ -48,12 +48,12 @@ figure(1011); subplot(1,2,2); imagesc(permute(g_pre_map,[2,1,3]));
 g_diff = g_pre_map-permute(single(map1), [2,1,3]);
 caffe('backward_gnet', {single(g_diff)});
 caffe('update_gnet');
-fprintf('Iteration %03d/%03d, Local Loss %f, Global Loss %f\n', i, max_iter, sum(abs(l_diff(:))), sum(abs(g_diff(:))));
+fprintf('Iteration %03d/%03d, Local Loss %f, Global Loss %f\n', i, max_iter, sum(abs(s_diff(:))), sum(abs(g_diff(:))));
 end
 
 
-[lsal, lid] = compute_saliency({lfea1}, map1, 'lsolver');
-[gsal, gid] = compute_saliency({gfea1}, map1, 'gsolver');
+[~, lid] = compute_saliency({lfea1}, map1, 'ssolver');
+[~, gid] = compute_saliency({gfea1}, map1, 'gsolver');
 
 lid = lid(1:ch_num);
 gid = gid(1:ch_num);
@@ -63,34 +63,34 @@ gfea1 = gfea1(:,:,gid);
 fea2_store = lfea1;
 map2_store = map1;
 %% train
-caffe('init_lsolver', lnet_solver_def_file, model_file);
-caffe('init_gsolver', gnet_solver_def_file, model_file);
+caffe('init_ssolver', snet_solver_def_file);
+caffe('init_gsolver', gnet_solver_def_file);
 caffe('set_phase_train');
 caffe('presolve_gnet');
-caffe('presolve_lnet');
+caffe('presolve_snet');
 for i=1:max_iter
-l_pre_map = caffe('forward_lnet', {lfea1});
-l_pre_map = l_pre_map{1};
-figure(1011); subplot(1,2,1); imagesc(permute(l_pre_map,[2,1,3]));
+s_pre_map = caffe('forward_snet', {lfea1});
+s_pre_map = s_pre_map{1};
+figure(1011); subplot(1,2,1); imagesc(permute(s_pre_map,[2,1,3]));
 g_pre_map = caffe('forward_gnet', {gfea1});
 g_pre_map = g_pre_map{1};
 figure(1011); subplot(1,2,2); imagesc(permute(g_pre_map,[2,1,3]));
 
-l_diff = l_pre_map-permute(single(map1), [2,1,3]);
-input_diff = caffe('backward_lnet', {single(l_diff)});
-caffe('update_lnet');
+s_diff = s_pre_map-permute(single(map1), [2,1,3]);
+input_diff = caffe('backward_snet', {single(s_diff)});
+caffe('update_snet');
 g_diff = g_pre_map-permute(single(map1), [2,1,3]);
 input_diff = caffe('backward_gnet', {single(g_diff)});
 caffe('update_gnet');
-fprintf('Iteration %03d/%03d, Local Loss %f, Global Loss %f\n', i, max_iter, sum(abs(l_diff(:))), sum(abs(g_diff(:))));
+fprintf('Iteration %03d/%03d, Local Loss %f, Global Loss %f\n', i, max_iter, sum(abs(s_diff(:))), sum(abs(g_diff(:))));
 end
 %% ================================================================
 t=0;
-fnum = size(GT,1);
+
 position = zeros(6, fnum);
 best_geo_param = loc2affgeo(location, pf_param.p_sz);
 for im2_id = im1_id:fnum
-    l_distractor = false;
+    s_distractor = false;
     g_distractor = false;
     caffe('set_phase_test');
     location_last = location;
@@ -103,7 +103,7 @@ for im2_id = im1_id:fnum
     end
 
     %% extract roi and display
-    [roi2, roi_pos, padded_zero_map, pad] = ext_roi(im2, location, l2_off,  roi_size, s2);
+    [roi2, roi_pos, padded_zero_map, pad] = ext_roi(im2, location, [0, 0],  roi_size, s2);
     %% draw particles
     geo_param = drawparticals(best_geo_param, pf_param);
     %% preprocess roiroi
@@ -115,11 +115,11 @@ for im2_id = im1_id:fnum
     gfea2 = imresize(fea2{2}, fea_sz(1:2));
     gfea2 = gfea2(:,:,gid);
     %% compute confidence map
-    l_pre_map = caffe('forward_lnet', {lfea2});
-    l_pre_map = permute(l_pre_map{1}, [2,1,3])/(max(l_pre_map{1}(:))+eps);
+    s_pre_map = caffe('forward_snet', {lfea2});
+    s_pre_map = permute(s_pre_map{1}, [2,1,3])/(max(s_pre_map{1}(:))+eps);
     g_pre_map = caffe('forward_gnet', {gfea2});
     g_pre_map = permute(g_pre_map{1}, [2,1,3])/(max(g_pre_map{1}(:))+eps);
-    figure(1011); subplot(1,2,1); imagesc(l_pre_map);
+    figure(1011); subplot(1,2,1); imagesc(s_pre_map);
     figure(1011); subplot(1,2,2); imagesc(g_pre_map);
 
     %% compute global confidence
@@ -137,17 +137,17 @@ for im2_id = im1_id:fnum
 
     
     %% compute local confidence
-    l_roi_map = imresize(l_pre_map, roi_pos(4:-1:3));
-    l_im_map = padded_zero_map;
-    l_im_map(roi_pos(2):roi_pos(2)+roi_pos(4)-1, roi_pos(1):roi_pos(1)+roi_pos(3)-1) = l_roi_map;
-    l_im_map = l_im_map(pad+1:end-pad, pad+1:end-pad);
-    l_im_map = double(l_im_map>0.1).*l_im_map;
+    s_roi_map = imresize(s_pre_map, roi_pos(4:-1:3));
+    s_im_map = padded_zero_map;
+    s_im_map(roi_pos(2):roi_pos(2)+roi_pos(4)-1, roi_pos(1):roi_pos(1)+roi_pos(3)-1) = s_roi_map;
+    s_im_map = s_im_map(pad+1:end-pad, pad+1:end-pad);
+    s_im_map = double(s_im_map>0.1).*s_im_map;
     
  
-    wmaps = warpimg(l_im_map, affparam2mat(geo_param), [pf_param.p_sz, pf_param.p_sz]);
-    l_conf = reshape(sum(sum(wmaps))/pf_param.p_sz^2, [], 1);
-    l_rank_conf = l_conf.*(pf_param.p_sz^2*geo_param(3,:)'.*geo_param(3,:)'.*geo_param(5,:)').^0.75;
-    [~, l_maxid] = max(l_rank_conf);
+    wmaps = warpimg(s_im_map, affparam2mat(geo_param), [pf_param.p_sz, pf_param.p_sz]);
+    s_conf = reshape(sum(sum(wmaps))/pf_param.p_sz^2, [], 1);
+    s_rank_conf = s_conf.*(pf_param.p_sz^2*geo_param(3,:)'.*geo_param(3,:)'.*geo_param(5,:)').^0.75;
+    [~, s_maxid] = max(s_rank_conf);
     
 
         %% gnet detect distractor
@@ -162,33 +162,33 @@ for im2_id = im1_id:fnum
     if outside_conf >= 0.2*inside_conf
         g_distractor = true;
     end
-    %% lnet detect distractor
-    rectified_im_map = single(l_im_map>0.01).*single(l_im_map);
+    %% snet detect distractor
+    rectified_im_map = single(s_im_map>0.01).*single(s_im_map);
     inside_conf = sum(sum(rectified_im_map(py1:py2, px1:px2)));
     outside_conf = sum(sum(rectified_im_map)) - inside_conf;
     if outside_conf >= 0.2*inside_conf
-        l_distractor = true;
+        s_distractor = true;
     end
     
-    if g_distractor %|| l_distractor
-        maxconf = l_conf(l_maxid);
-        maxid = l_maxid;
-        pre_map = l_roi_map;
+    if g_distractor %|| s_distractor
+        maxconf = s_conf(s_maxid);
+        maxid = s_maxid;
+        pre_map = s_roi_map;
     else
         maxconf = g_conf(g_maxid);
         maxid = g_maxid; 
         pre_map = g_roi_map;
     end
 
-    fprintf('lmaxconf =  %f,   gmaxconf = %f\n', l_conf(l_maxid),  g_conf(g_maxid));
+    fprintf('lmaxconf =  %f,   gmaxconf = %f\n', s_conf(s_maxid),  g_conf(g_maxid));
    
     if maxconf>pf_param.mv_thr
     location = affgeo2loc(geo_param(:, maxid), pf_param.p_sz);
     best_geo_param = geo_param(:, maxid);
-    elseif l_conf(l_maxid)>pf_param.mv_thr
-    location = affgeo2loc(geo_param(:, l_maxid), pf_param.p_sz);
-    best_geo_param = geo_param(:, l_maxid);
-    maxconf = l_conf(l_maxid);
+    elseif s_conf(s_maxid)>pf_param.mv_thr
+    location = affgeo2loc(geo_param(:, s_maxid), pf_param.p_sz);
+    best_geo_param = geo_param(:, s_maxid);
+    maxconf = s_conf(s_maxid);
     end
     
     if maxconf< pf_param.up_thr
@@ -217,22 +217,22 @@ for im2_id = im1_id:fnum
         
         if conf_store>pf_param.up_thr && mod(im2_id,20) == 0 % && ~l_distractor_store
             caffe('set_phase_train');
-            caffe('reshape_input', 'lsolver', [0, 2, length(lid), fea_sz(2), fea_sz(1)]);
+            caffe('reshape_input', 'ssolver', [0, 2, length(lid), fea_sz(2), fea_sz(1)]);
             fea2_train{1}(:,:,:,1) = lfea1;
             fea2_train{1}(:,:,:,2) = fea2_store;
 
-            l_pre_map = caffe('forward_lnet', fea2_train);
-            diff{1}(:,:,:,1) = 0.5*(l_pre_map{1}(:,:,:,1)-permute(single(map1), [2,1,3]));
-            diff{1}(:,:,:,2) = 0.5*(l_pre_map{1}(:,:,:,2)-permute(single(map2_store), [2,1,3]));
-            caffe('backward_lnet', diff);
-            caffe('update_lnet');
+            s_pre_map = caffe('forward_snet', fea2_train);
+            diff{1}(:,:,:,1) = 0.5*(s_pre_map{1}(:,:,:,1)-permute(single(map1), [2,1,3]));
+            diff{1}(:,:,:,2) = 0.5*(s_pre_map{1}(:,:,:,2)-permute(single(map2_store), [2,1,3]));
+            caffe('backward_snet', diff);
+            caffe('update_snet');
             conf_store = pf_param.up_thr;
-            caffe('reshape_input', 'lsolver', [0, 1, length(lid), fea_sz(2), fea_sz(1)]);
+            caffe('reshape_input', 'ssolver', [0, 1, length(lid), fea_sz(2), fea_sz(1)]);
         end
         
-            if l_distractor && maxconf> pf_param.up_thr
+            if s_distractor && maxconf> pf_param.up_thr
                 caffe('set_phase_train');
-                caffe('reshape_input', 'lsolver', [0, 2,length(lid), fea_sz(2), fea_sz(1)]);
+                caffe('reshape_input', 'ssolver', [0, 2,length(lid), fea_sz(2), fea_sz(1)]);
                 lfea2_train(:,:,:,1) = fea2_store;
                 lfea2_train(:,:,:,2) = lfea2;
                 l_off = location_last(1:2)-location(1:2);
@@ -240,13 +240,13 @@ for im2_id = im1_id:fnum
                 iter = 10;
 %                 diff = cell(1);
                 for i=1:iter
-                    l_pre_map = caffe('forward_lnet', {lfea2_train});
-                    diff{1}(:,:,:,1) = 0.5*(l_pre_map{1}(:,:,:,1)-permute(single(map2_store), [2,1,3]));
-                    diff{1}(:,:,:,2) = 0.5*squeeze(l_pre_map{1}(:,:,:,2)-permute(single(map),[2,1,3])).*permute(single(map<=0), [2,1,3]);
-                    caffe('backward_lnet', diff);
-                    caffe('update_lnet');
+                    s_pre_map = caffe('forward_snet', {lfea2_train});
+                    diff{1}(:,:,:,1) = 0.5*(s_pre_map{1}(:,:,:,1)-permute(single(map2_store), [2,1,3]));
+                    diff{1}(:,:,:,2) = 0.5*squeeze(s_pre_map{1}(:,:,:,2)-permute(single(map),[2,1,3])).*permute(single(map<=0), [2,1,3]);
+                    caffe('backward_snet', diff);
+                    caffe('update_snet');
                 end
-                caffe('reshape_input', 'lsolver', [0, 1, length(lid), fea_sz(2), fea_sz(1)]);
+                caffe('reshape_input', 'ssolver', [0, 1, length(lid), fea_sz(2), fea_sz(1)]);
             end   
     %% save results
 
@@ -258,7 +258,7 @@ for im2_id = im1_id:fnum
     end
     
 end
-save([track_res '/position.mat'], 'position');
+% save([track_res '/position.mat'], 'position');
 end
 
 
