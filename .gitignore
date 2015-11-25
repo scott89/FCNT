@@ -1,4 +1,5 @@
 *.m~
+*.~
 *.mex64
 *.mexa64
 *.mexglx
