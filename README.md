@@ -20,7 +20,7 @@ FCNT is an online visual tracking algorithm using fully convolutional neural net
 
 If you find FCNT useful in your research, please consider to cite our paper:
 
-        @inproceedings{ wang2015deep,
+        @inproceedings{ wang2015visual,
            title={Visual Tracking with Fully Convolutional Networks},
            author={Wang, Lijun and Ouyang, Wanli and Wang, Xiaogang and Lu, Huchuan},
            booktitle={IEEE International Conference on Computer Vision (ICCV)},
