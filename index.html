@@ -4,14 +4,14 @@
 <title>Visual Tracking with Fully Convolutional Networks</title></head>
 
 <body class="page page-id-544 page-template page-template-page-templates page-template-template-full-width page-template-page-templatestemplate-full-width-php expound-full-width">
-<div style="width: 1800px; margin-left:auto; margin-right:auto">
+<div style="width: 5000px; margin-left:auto; margin-right:auto">
 <h1 align="center">Visual Tracking with fully Convolutional Networks</h1>
 <p align="center">Lijun Wang<sup>1,2</sup>;, Wanli Ouyang<sup>2</sup>, Xiaogang Wang<sup>2</sup>, and Huchuan Lu<sup>1</sup><br> 
 <sup>1</sup> Dalian University of Technology, Dalian, China<br />
 <sup>2</sup> The Chinese University of Hong Kong, Hong Kong, China <br /> <br />
 ICCV 2015</p>
 </div>
-<div style="width: 1800px; margin-left:auto; margin-right:auto">
+<div style="width: 3000px; margin-left:auto; margin-right:auto">
 <table  align="center" style="text-align: left; width: 83%;" border="0" cellpadding="2" cellspacing="2">
   <tr align="center">
     <td>
@@ -27,11 +27,12 @@ ICCV 2015</p>
   </tr>
 </table>     
 </div>
-<div style="width: 1800px; margin-left:auto; margin-right:auto">
+<div style="width: 2500px; margin-left:auto; margin-right:auto">
 
       <p align="justify">In this paper, we propose a new approach for general object tracking with fully convolutional neural network. Instead of treating covolutional networks as black-box feature extractors, we conduct in-depth study on the properties of CNN features offline pre-trained on massive image classification task on ImageNet. The discoveries motivate the design of our tracking system. It is found that convolutional layers in different levels characterize the target from different perspectives. A top layer encodes more semantic features. They are strong at distinguishing objects of different classes and are very robust to deformation (Figure 1 (a)). However, they are less discriminative to objects of the same category (Figure 1 (b)). In contrast,  a lower layer carries more discriminative information and is better suited for distinguishing the target from distracters with similar apperance (Figure 1 (b)). But they are less robust to dramatic change of apperance (Figure 1 (a)). Thus we propose to jointly consider both layers during tracking and automatically switch the usage of these two layers depending on the occurrence of distracters. It is also found that for a particular tracking target, only a small subset of neurons are relevant, whereas some feature responses may serve as noise (Figure 1 (c)). A feature map selection method is developed to select useful feature maps and remove noisy and irrelevant ones, which can reduce computation redundancy and further improve tracking accuracy. The pipeline of our method is shown in Figure 2.  Extensive evaluation on the widely used tracking benchmark shows that the proposed tracker performs favorably against the state-of-the-art methods (See Figure 3).</p>
-
 <br />
+</div>
+<div style="width: 3000px; margin-left:auto; margin-right:auto">
 <figure align="center">
   <img src="./files/pipeline.png" width="1200">
   <p align="center">Figure 2. Pipeling of our tracking method </p>
@@ -41,7 +42,8 @@ ICCV 2015</p>
   <img src="./files/plots.png" width="1000">
   <p align="center">Figure 3. Evaluation results on tracking benchmark data set. </p>
 </figure>
-
+</div>
+<div style="width: 2500px; margin-left:auto; margin-right:auto">
 <h2> Download </h2>
 <p> Lijun Wang, Wanli Ouyang, Xiaogang Wang, and Huchuan Lu. Visual Tracking with Fully Convolutional Networks. IEEE ICCV 2015. [<a href="http://202.118.75.4/lu/Paper/ICCV2015/iccv15_lijun.pdf">PDF</a>][<a href="http://pan.baidu.com/s/1c0sOq7Q">Code</a>][<a href="http://pan.baidu.com/s/1bnfZe1p">Tracking results on OBT50]</a></p>
 </div>
