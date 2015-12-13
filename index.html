@@ -12,19 +12,19 @@
 ICCV 2015</p>
 <br />
 <br />
+<br />
+
 </div>
 <div style="width: 800px; margin-left:auto; margin-right:auto">
 	<img src="./files/figure1-abc.png" height="200">
-    
-
       <p>Figure 1. Feature maps for target localization. (a)(b) From left to right: input images, the ground truth target heat maps, the predicted heat maps using feature maps of Conv5-3 and Conv4-3 layers of VGG network. (c) From left to right: input images, ground truth foreground mask, average feature maps of Conv5-3 (top) and Conv4-3 (bottom) layers, average selected feature maps of Conv5-3 and Conv4-3 layers.</p>
-  
 </div>
-<div style="width: 800px; margin-left:auto; margin-right:auto">
 
+<div style="width: 800px; margin-left:auto; margin-right:auto">
       <p align="justify">In this paper, we propose a new approach for general object tracking with fully convolutional neural network. Instead of treating covolutional networks as black-box feature extractors, we conduct in-depth study on the properties of CNN features offline pre-trained on massive image classification task on ImageNet. The discoveries motivate the design of our tracking system. It is found that convolutional layers in different levels characterize the target from different perspectives. A top layer encodes more semantic features. They are strong at distinguishing objects of different classes and are very robust to deformation (Figure 1 (a)). However, they are less discriminative to objects of the same category (Figure 1 (b)). In contrast,  a lower layer carries more discriminative information and is better suited for distinguishing the target from distracters with similar apperance (Figure 1 (b)). But they are less robust to dramatic change of apperance (Figure 1 (a)). Thus we propose to jointly consider both layers during tracking and automatically switch the usage of these two layers depending on the occurrence of distracters. It is also found that for a particular tracking target, only a small subset of neurons are relevant, whereas some feature responses may serve as noise (Figure 1 (c)). A feature map selection method is developed to select useful feature maps and remove noisy and irrelevant ones, which can reduce computation redundancy and further improve tracking accuracy. The pipeline of our method is shown in Figure 2.  Extensive evaluation on the widely used tracking benchmark shows that the proposed tracker performs favorably against the state-of-the-art methods (See Figure 3).</p>
 <br />
 </div>
+
 <div style="width: 800px; margin-left:auto; margin-right:auto">
   <img src="./files/pipeline.png" width="800">
   <p align="center">Figure 2. Pipeling of our tracking method </p>
@@ -42,5 +42,5 @@ ICCV 2015</p>
 <br /><br />
 <br /><br />
 <br /><br />
-<div style="width: 800px; margin-left:auto; margin-right:auto"><script align='center' type="text/javascript" src="//ra.revolvermaps.com/0/0/1.js?i=0g5kk8ufwzj&amp;m=7&amp;s=320&amp;c=e63100" async="async"></script></div>
+<div style="width: 10px; margin-left:auto; margin-right:auto"><script align='center' type="text/javascript" src="//ra.revolvermaps.com/0/0/1.js?i=0g5kk8ufwzj&amp;m=7&amp;s=320&amp;c=e63100" async="async"></script></div>
 </body></html>
