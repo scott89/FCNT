@@ -1,4 +1,4 @@
-function [ res] = run_FCNT(seq, a, res_path, bSaveImage )
+function [ res] = run_FCNT(seq, res_path, bSaveImage )
 close all
 cd tracker/FCNT/
 addpath('caffe-fcnt/matlab/caffe/','util/');
