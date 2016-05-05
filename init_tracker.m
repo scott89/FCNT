@@ -1,20 +1,17 @@
-function tracker_param = init_tracker(data_path, seq_name)
+function tracker_param = init_tracker(seq)
 %% particle filter parameters
 pf_param = struct('affsig', [10,10,.004,.00,0.00,0], 'p_sz', 64,...
-            'p_num', 600, 'mv_thr', 0.1, 'up_thr', 0.35, 'roi_scale', 2);
+            'p_num', 700, 'mv_thr', 0.1, 'up_thr', 0.35, 'roi_scale', 2);
 %% check if sequence exists
-seq_path = [data_path seq_name '/'];
-if ~isdir(seq_path)
-    error('Sequence %s does not exist!', seq_name);
-end
+seq_path = seq.path;
 tracker_param.seq_path = seq_path;
-try
-    GT = load([seq_path 'groundtruth_rect.txt']);
-catch
-    error('Ground truth files does not exist!');
-end
+
 %% parameters to crop ROI
-location = GT(1, :);
+location = seq.init_rect;
+pf_param.affsig(1) = ceil((location(3)^2 + location(4)^2)^0.5/7);
+% pf_param.affsig(1) = max(min(location(3), location(4))/4, 7);
+pf_param.affsig(2) = pf_param.affsig(1);
+% pf_param.p_num = floor(7 * pf_param.affsig(1) * pf_param.affsig(2));
 tracker_param.location = location;
 dia = (location(3)^2 + location(4)^2)^0.5;
 scale = [dia / location(3), dia / location(4)];
@@ -31,8 +28,9 @@ pf_param.minconf = 0.5;
 tracker_param.pf_param = pf_param;
 %% init feature net and sel-cnn 
 tracker_param.ch_num = 384; %% number of selected channels;
-feature_solver_def_file = 'feature_model/feature_solver.prototxt';
-model_file = 'feature_model/VGG_ILSVRC_16_layers.caffemodel';
+
+feature_solver_def_file = './model/feature_solver.prototxt';
+model_file = '/home/lijun/Research/Code/FCT_scale_base/model/VGG_ILSVRC_16_layers.caffemodel';
 caffe('init_solver', feature_solver_def_file, model_file);
 
 select_snet_solver_def_file = 'solver/select_snet_solver.prototxt'; 

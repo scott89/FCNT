@@ -1,5 +1,5 @@
 function  position = cnn2_pf_tracker(tracker_param)
-
+randn('state',0);
 load_tracker_param;
 caffe('presolve_gnet');
 caffe('presolve_snet');
@@ -82,7 +82,7 @@ end
 %% ================================================================
 close all;
 
-position = zeros(6, fnum);
+position = zeros(6, fnum-im1_id+1);
 best_geo_param = loc2affgeo(location, pf_param.p_sz);
 for im2_id = im1_id:fnum
     s_distractor = false;
@@ -185,13 +185,13 @@ for im2_id = im1_id:fnum
     end
     
     if maxconf< pf_param.up_thr
-        best_geo_param([3,5]) =  position([3,5], im2_id-1);
+        best_geo_param([3,5]) =  position([3,5], im2_id-im1_id);
         location = affgeo2loc( best_geo_param, pf_param.p_sz);
     end
     
     
     drawresult(im2_id, mat2gray(im2), [pf_param.p_sz, pf_param.p_sz], affparam2mat(best_geo_param));
-    position(:, im2_id) = best_geo_param;
+    position(:, im2_id- im1_id +1) = best_geo_param;
     mask = mat2gray(imresize(pre_map, [roi_size, roi_size]));
     
     
@@ -206,7 +206,7 @@ for im2_id = im1_id:fnum
     end
     
     
-    if conf_store>pf_param.up_thr && mod(im2_id,20) == 0 % && ~l_distractor_store
+    if conf_store>pf_param.up_thr && mod(im2_id-im1_id +1,20) == 0 % && ~l_distractor_store
         caffe('set_phase_train');
         caffe('reshape_input', 'ssolver', [0, 2, length(lid), fea_sz(2), fea_sz(1)]);
         fea2_train{1}(:,:,:,1) = lfea1;
@@ -244,7 +244,7 @@ for im2_id = im1_id:fnum
     if pf_param.minconf > maxconf
         pf_param.minconf = maxconf;
     end
-    if im2_id ==20
+    if im2_id == check_num
         pf_param = reestimate_param(pf_param);
     end
     
