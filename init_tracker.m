@@ -5,6 +5,10 @@ pf_param = struct('affsig', [10,10,.004,.00,0.00,0], 'p_sz', 64,...
 %% check if sequence exists
 seq_path = seq.path;
 tracker_param.seq_path = seq_path;
+%% 
+tracker_param.startFrame = seq.startFrame;
+tracker_param.endFrame = seq.endFrame;
+tracker_param.init_rect = seq.init_rect;
 
 %% parameters to crop ROI
 location = seq.init_rect;
